@@ -57,9 +57,10 @@ class Object(object):
     collections of attributes. Objects can inherit attributes from parent
     objects."""
 
-    def __init__(self, name, parent=None):
+    def __init__(self, name, parent=None, source=None):
         self.name = name
         self.parent = parent
+        self.source = source
         self.attributes = {}
 
     def setParent(self, parent):
@@ -89,7 +90,7 @@ class Object(object):
         except KeyError:
             parent = None
 
-        obj = Object(name, parent)
+        obj = Object(name, parent, self)
 
         for p, v in properties.iteritems():
             if type(v) is str:
@@ -99,7 +100,7 @@ class Object(object):
 
     def spawn(self, name):
         """Return a new derived object (parent is self)"""
-        return Object(name, self)
+        return Object(name, self, self)
 
     def clone(self, name):
         """Return a shallow copy"""
@@ -111,14 +112,14 @@ class Object(object):
     def alias(self, name):
         """Returns a fully-syncrhonized copy of object. Changes to the
         attributes of either object affect both objects."""
-        ret = Object(name, self.parent)
+        ret = Object(name, self.parent, self)
         ret.attributes = self.attributes
         return ret
 
     def copy(self, name):
         """Returns a deep copy of object. All object attributes are dupliated
         in the new child"""
-        ret = Object(name, self.parent)
+        ret = Object(name, self.parent, self)
         for p, v in self.attributes.iteritems():
             if isinstace(v, Object):
                 v = v.copy()
