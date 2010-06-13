@@ -192,3 +192,4 @@ kill.perform(alice, bob)
 assert bob.getAttribute("living") == False
 assert bob.getAttribute("killer") == alice
 assert alice.getAttribute("victim") == bob
+assert alice.has("killer") == False

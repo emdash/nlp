@@ -124,7 +124,7 @@ class Object(object):
             return self.attributes[name]
         if self.parent:
             return self.parent.getAttribute(name)
-        return KeyError("object %s does not have attribute %s" % 
+        raise KeyError("object %s does not have attribute %s" % 
             (self.name, name))
 
     def setAttribute(self, name, value):
@@ -194,6 +194,12 @@ class Object(object):
             else:
                 return self.parent.isA(category)
         return False
+
+    def has(self, quality):
+        try:
+            return bool(self.getAttribute(quality))
+        except KeyError:
+            return False
 
     def __eq__(self, other):
         # we compare based name, attribute. this should allow aliases with
