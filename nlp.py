@@ -32,7 +32,17 @@ class PropertyChangeAction(object):
         self.value = v
 
     def perform(self):
-        self.agent.setAttribute(self.propertyname, self.value)
+        self.patient.setAttribute(self.propertyname, self.value)
+
+class ReparentAction(Action):
+
+    """Sets the parent of patient to p"""
+
+    def __init__(self, p, *args):
+        self.new_parent = p
+
+    def perform(self):
+        self.patient.setParent(self.new_parent)
 
 class Object(object):
 
