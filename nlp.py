@@ -22,6 +22,18 @@ class Action(object):
     def perform(self):
         raise NotImplementedError()
 
+class PropertyChangeAction(object):
+
+    """Changes property p on its patient to value v"""
+
+    def __init__(self, p, v, *args):
+        Action.__init__(*args)
+        self.propertyname = p
+        self.value = v
+
+    def perform(self):
+        self.agent.setAttribute(self.propertyname, self.value)
+
 class Object(object):
 
     """An object is a reference to something in a space. Objects are also
@@ -40,6 +52,12 @@ class Object(object):
             return self.parent.getAttribute(self, name)
         return KeyError("object %s does not have attribute %s" % 
             (self.name, name)
+
+    def setAttribute(self, name, value):
+        self.attributes[name] = value
+
+    def __str__(self):
+        return self.name
 
 class World(Object):
 
