@@ -1,13 +1,11 @@
 # I will begin at the beginning.
 
-class Clause(object):
+class Statement(object):
 
-    """In an abstract sense, a clause is when an agent performs an action on a
-    patient. Agent and patients are Objects. I don't know yet whether an
-    Action is a type of object or not."""
+    """An instance of an action"""
 
     def __init__(self, agent, patient, action):
-        self.agent = agent.
+        self.agent = agent
         self.patient = patient
         self.action = action
 
