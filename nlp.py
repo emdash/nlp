@@ -40,6 +40,17 @@ class ReparentAction(Action):
     def perform(self, agent, patient):
         self.patient.setParent(self.new_parent)
 
+class CompoundAction(Action):
+
+    """Group a set of actions"""
+
+    def __init__(self, *actions):
+        self.actions = actions
+
+    def perform(self, agent, patient):
+        for action in self.actions:
+            action.perform(agent, patient)
+
 class Object(object):
 
     """An object is a reference to something in a space. Objects are also
