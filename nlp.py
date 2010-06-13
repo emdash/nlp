@@ -19,16 +19,33 @@ class Action(object):
     def perform(self, agent, patient):
         raise NotImplementedError()
 
-class PropertyChangeAction(object):
+class PropertyChangeAction(Action):
 
     """Changes property p on its patient to value v"""
 
-    def __init__(self, p, v):
+    def __init__(self, p, v=None):
         self.propertyname = p
         self.value = v
 
+class PatientAttributeChange(PropertyChangeAction):
+
+    """set's named patient attribute to agent"""
+
     def perform(self, agent, patient):
-        self.patient.setAttribute(self.propertyname, self.value)
+        value = self.value
+        if value is None:
+            value = agent
+        patient.setAttribute(self.propertyname, value)
+
+class AgentAttributeChange(PropertyChangeAction):
+
+    """set's agent attribute to patient"""
+
+    def perform(self, agent, patient):
+        value = self.value
+        if value is None:
+            value = patient
+        agent.setAttribute(self.propertyname, value)
 
 class ReparentAction(Action):
 
@@ -38,7 +55,43 @@ class ReparentAction(Action):
         self.new_parent = p
 
     def perform(self, agent, patient):
-        self.patient.setParent(self.new_parent)
+        patient.setParent(self.new_parent)
+
+class ReplaceAncestorAction(Action):
+
+    """Replaces an arbitrary ancestor with a given one."""
+
+    def __init__(self, old, new):
+        self.old = old
+        self.new = new
+
+    def perform(self, agent, patient):
+        # This isn't as straight-forward as it would at first seem. We can't
+        # simply swap the original parent for the new one where it appears in
+        # the hierarchy, because it would affect other objects as well.
+
+        # we walk the tree and construct a new chain of parents. the ability
+        # to alias objects allows this new chain of parents that are identical
+        # to the originals, except they inherit from this new chain.
+
+        cur = patient.parent
+        if cur is None:
+            raise Exception("%s has no parent", patient)
+
+        first = cur.alias()
+        prev = first
+
+        while cur != self.old:
+            if cur is None:
+                raise Exception("%s is not an ancestor of %s", self.old, patient)
+            alias = cur.alias()
+            if prev:
+                prev.setParent(alias)
+            prev = alias
+            cur = cur.parent
+
+        prev.setParent(self.new)
+        patient.setParent(first)
 
 class CompoundAction(Action):
 
@@ -100,18 +153,24 @@ class Object(object):
 
     def spawn(self, name):
         """Return a new derived object (parent is self)"""
+        if not name:
+            name = self.name
         return Object(name, self, self)
 
-    def clone(self, name):
+    def clone(self, name=None):
         """Return a shallow copy"""
+        if not name:
+            name = self.name
         ret = Object(name, self.parent, self)
         for p, v in self.attributes.iteritems():
             ret.setAttribute(p, v)
         return ret
 
-    def alias(self, name):
+    def alias(self, name=None):
         """Returns a fully-syncrhonized copy of object. Changes to the
         attributes of either object affect both objects."""
+        if not name:
+            name = self.name
         ret = Object(name, self.parent, self)
         ret.attributes = self.attributes
         return ret
@@ -128,11 +187,44 @@ class Object(object):
             ret.setAttribute(p, v)
         return ret
 
+    def isA(self, category):
+        if self.parent:
+            if self.parent == category:
+                return True
+            else:
+                return self.parent.isA(category)
+        return False
+
+    def __eq__(self, other):
+        # we compare based name, attribute. this should allow aliases with
+        # identical names to appear to be the same object
+        return (self.name == other.name) and (self.attributes ==
+            other.attributes)
+
     def __str__(self):
         return self.name
 
-class World(Object):
+class Scene(object):
 
-    """A world is the root object of discourse."""
+    """A set of actors and actions in a context"""
 
     pass
+
+class Schema(object):
+
+    """A sequence of scenes"""
+
+    pass
+
+class Discourse(Object):
+
+    """The central object of our NLP processing engine. It maintains a history
+    of statements and an object tree according to the input it receives."""
+
+    def __init__(self):
+        self.history = [Object("root")]
+        self.statements = []
+
+    def addStatement(self, statement):
+        self.statements.append(statement)
+        self.history.append(statement.Apply())
