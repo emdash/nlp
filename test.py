@@ -178,7 +178,7 @@ assert bob.getAttribute("hands") == 2
 die = kill
 die.name = "die"
 
-kill = CompoundAction
+kill = CompoundAction(
     die, 
     PatientAttributeChange("killer"),
     AgentAttributeChange("victim"))
