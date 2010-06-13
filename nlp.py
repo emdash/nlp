@@ -9,6 +9,9 @@ class Statement(object):
         self.patient = patient
         self.action = action
 
+    def Apply(self):
+        action.perform(self.agent, self.patient)
+
 class Action(object):
     """An action is a transformation of an object. An action is defined in
     terms of an agent, a patient, and one or more attributes."""
