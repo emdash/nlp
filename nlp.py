@@ -16,33 +16,28 @@ class Action(object):
     """An action is a transformation of an object. An action is defined in
     terms of an agent, a patient, and one or more attributes."""
 
-    def __init__(self, agent, patient):
-        self.agent = agent
-        self.patient = patient
-
-    def perform(self):
+    def perform(self, agent, patient):
         raise NotImplementedError()
 
 class PropertyChangeAction(object):
 
     """Changes property p on its patient to value v"""
 
-    def __init__(self, p, v, *args):
-        Action.__init__(*args)
+    def __init__(self, p, v):
         self.propertyname = p
         self.value = v
 
-    def perform(self):
+    def perform(self, agent, patient):
         self.patient.setAttribute(self.propertyname, self.value)
 
 class ReparentAction(Action):
 
     """Sets the parent of patient to p"""
 
-    def __init__(self, p, *args):
+    def __init__(self, p):
         self.new_parent = p
 
-    def perform(self):
+    def perform(self, agent, patient):
         self.patient.setParent(self.new_parent)
 
 class Object(object):
