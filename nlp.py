@@ -80,6 +80,9 @@ class Object(object):
             del self.attributes[name]
         return self
 
+    def addAttribute(self, value):
+        return self.setAttribute(value.name, value)
+
     def __str__(self):
         return self.name
 
