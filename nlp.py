@@ -69,9 +69,9 @@ class Object(object):
         if name in self.attributes:
             return self.attributes[name]
         if self.parent:
-            return self.parent.getAttribute(self, name)
+            return self.parent.getAttribute(name)
         return KeyError("object %s does not have attribute %s" % 
-            (self.name, name)
+            (self.name, name))
 
     def setAttribute(self, name, value):
         if not (value is None):
@@ -82,6 +82,48 @@ class Object(object):
 
     def addAttribute(self, value):
         return self.setAttribute(value.name, value)
+
+    def addObject(self, name, parent=None, **properties):
+        try:
+            parent = self.getAttribute(parent)
+        except KeyError:
+            parent = None
+
+        obj = Object(name, parent)
+
+        for p, v in properties.iteritems():
+            if type(v) is str:
+                obj.setAttribute(p, self.getAttribute(v))
+
+        return self.addAttribute(obj)
+
+    def spawn(self, name):
+        """Return a new derived object (parent is self)"""
+        return Object(name, self)
+
+    def clone(self, name):
+        """Return a shallow copy"""
+        ret = Object(name, self.parent)
+        for p, v in self.attributes.iteritems():
+            ret.setAttribute(p, v)
+        return ret
+
+    def alias(self, name):
+        """Returns a fully-syncrhonized copy of object. Changes to the
+        attributes of either object affect both objects."""
+        ret = Object(name, self.parent)
+        ret.attributes = self.attributes
+        return ret
+
+    def copy(self, name):
+        """Returns a deep copy of object. All object attributes are dupliated
+        in the new child"""
+        ret = Object(name, self.parent)
+        for p, v in self.attributes.iteritems():
+            if isinstace(v, Object):
+                v = v.copy()
+            ret.setAttribute(p, v)
+        return ret
 
     def __str__(self):
         return self.name
