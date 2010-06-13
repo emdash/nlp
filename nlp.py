@@ -78,6 +78,7 @@ class Object(object):
             self.attributes[name] = value
         else:
             del self.attributes[name]
+        return self
 
     def __str__(self):
         return self.name
