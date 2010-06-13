@@ -45,6 +45,9 @@ class Object(object):
         self.parent = parent
         self.attributes = {}
 
+    def setParent(self, parent):
+        self.parent = parent
+
     def getAttribute(self, name):
         if name in self.attributes:
             return self.attributes[name]
@@ -54,7 +57,10 @@ class Object(object):
             (self.name, name)
 
     def setAttribute(self, name, value):
-        self.attributes[name] = value
+        if not (value is None):
+            self.attributes[name] = value
+        else:
+            del self.attributes[name]
 
     def __str__(self):
         return self.name
