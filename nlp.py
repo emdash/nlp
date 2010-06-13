@@ -104,7 +104,7 @@ class Object(object):
 
     def clone(self, name):
         """Return a shallow copy"""
-        ret = Object(name, self.parent)
+        ret = Object(name, self.parent, self)
         for p, v in self.attributes.iteritems():
             ret.setAttribute(p, v)
         return ret
@@ -116,12 +116,14 @@ class Object(object):
         ret.attributes = self.attributes
         return ret
 
-    def copy(self, name):
+    def copy(self, name=None):
         """Returns a deep copy of object. All object attributes are dupliated
         in the new child"""
+        if not name:
+            name = self.name
         ret = Object(name, self.parent, self)
         for p, v in self.attributes.iteritems():
-            if isinstace(v, Object):
+            if isinstance(v, Object):
                 v = v.copy()
             ret.setAttribute(p, v)
         return ret
