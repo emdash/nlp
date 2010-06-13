@@ -11,6 +11,17 @@ class Clause(object):
         self.patient = patient
         self.action = action
 
+class Action(object):
+    """An action is a transformation of an object. An action is defined in
+    terms of an agent, a patient, and one or more attributes."""
+
+    def __init__(self, agent, patient):
+        self.agent = agent
+        self.patient = patient
+
+    def perform(self):
+        raise NotImplementedError()
+
 class Object(object):
 
     """An object is a reference to something in a space. Objects are also
