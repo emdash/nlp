@@ -103,6 +103,10 @@ class Object(object):
         # to alias objects allows this new chain of parents that are identical
         # to the originals, except for their parent pointers
 
+        # TODO: memory optimization. memoize or otherwise cache so that we
+        # don't duplicate entire chains of parents when a suitable one already
+        # exists
+
         cur = self.parent
         if cur is None:
             raise Exception("%s has no parent", patient)
