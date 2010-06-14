@@ -234,6 +234,6 @@ class Object(object):
         cur = self
         chain = []
         while cur:
-            chain.append(str(cur.parent))
+            chain.append(str(cur))
             cur = cur.parent
         return "<" + ":".join(chain) + " " + str(self.attributes) + ">"
