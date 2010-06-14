@@ -15,7 +15,7 @@ class Processor(object):
 
     prompt = "> "
 
-    keywords = ["is", "to", "\'", "set"]
+    keywords = ["is", "to", "\'", "set", "of", "what"]
 
     def __init__(self):
         self.actions = {}
@@ -28,7 +28,11 @@ class Processor(object):
             (OBJECT, ACTION, OBJECT) : self.PerfomAction,
             ("is", OBJECT, OBJECT) : self.QueryAncestor,
             (UNDEFINED, "of", OBJECT, "is", OBJECT) : self.SetProperty,
+            (OBJECT, "of", OBJECT, "is", OBJECT) : self.SetProperty,
             ("what", UNDEFINED, "of", OBJECT) : self.QueryProperty,
+            ("what", OBJECT, "of", OBJECT) : self.QueryProperty,
+            ("change", OBJECT, "from", OBJECT, "to", OBJECT):
+                self.ReplaceParent
         }
 
         self.history = []
@@ -111,13 +115,16 @@ class Processor(object):
         target = self.objects[words[2]]
         value = self.objects[words[4]]
         target.setAttribute(propname, value)
-        history.append(raw)
+        self.history.append(raw)
         return "okay."
 
     def QueryProperty(self, raw, words):
         propname = words[1]
-        target = self.objects[words[4]]
+        target = self.objects[words[3]]
         return target.getAttribute(propname)
+
+    def ReplaceParent(self, raw, words):
+        obj = self.objects[words[1]]
 
 if __name__ == '__main__':
     Processor().printloop()
