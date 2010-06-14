@@ -66,32 +66,7 @@ class ReplaceAncestorAction(Action):
         self.new = new
 
     def perform(self, agent, patient):
-        # This isn't as straight-forward as it would at first seem. We can't
-        # simply swap the original parent for the new one where it appears in
-        # the hierarchy, because it would affect other objects as well.
-
-        # we walk the tree and construct a new chain of parents. the ability
-        # to alias objects allows this new chain of parents that are identical
-        # to the originals, except they inherit from this new chain.
-
-        cur = patient.parent
-        if cur is None:
-            raise Exception("%s has no parent", patient)
-
-        first = cur.alias()
-        prev = first
-
-        while cur != self.old:
-            if cur is None:
-                raise Exception("%s is not an ancestor of %s", self.old, patient)
-            alias = cur.alias()
-            if prev:
-                prev.setParent(alias)
-            prev = alias
-            cur = cur.parent
-
-        prev.setParent(self.new)
-        patient.setParent(first)
+        patient.replaceAncestor(self.old, self.new)
 
 class CompoundAction(Action):
 
@@ -118,6 +93,34 @@ class Object(object):
 
     def setParent(self, parent):
         self.parent = parent
+
+    def replaceAncestor(self, old, new):
+        # This isn't as straight-forward as it would at first seem. We can't
+        # simply swap the original parent for the new one where it appears in
+        # the hierarchy, because it would affect other objects as well.
+
+        # we walk the tree and construct a new chain of parents. the ability
+        # to alias objects allows this new chain of parents that are identical
+        # to the originals, except for their parent pointers
+
+        cur = self.parent
+        if cur is None:
+            raise Exception("%s has no parent", patient)
+
+        first = cur.alias()
+        prev = first
+
+        while cur != old:
+            if cur is None:
+                raise Exception("%s is not an ancestor of %s", self.old, patient)
+            alias = cur.alias()
+            if prev:
+                prev.setParent(alias)
+            prev = alias
+            cur = cur.parent
+
+        prev.setParent(new)
+        self.setParent(first)
 
     def getAttribute(self, name):
         if name in self.attributes:
