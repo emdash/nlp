@@ -227,12 +227,13 @@ class Object(object):
     def __str__(self):
         return self.name
 
+    def __repr__(self):
+        return "<%s>" % self.name
+
     def dump(self):
         cur = self
-        chain = "<"
+        chain = []
         while cur:
-            chain += "->" + str(cur)
+            chain.append(str(cur.parent))
             cur = cur.parent
-        chain += ">"
-        chain += "\n" + repr(self.attributes)
-        return chain
+        return "<" + ":".join(chain) + " " + str(self.attributes) + ">"
