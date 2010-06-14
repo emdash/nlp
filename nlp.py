@@ -227,27 +227,3 @@ class Object(object):
     def __str__(self):
         return self.name
 
-class Scene(object):
-
-    """A set of actors and actions in a context"""
-
-    pass
-
-class Schema(object):
-
-    """A sequence of scenes"""
-
-    pass
-
-class Discourse(Object):
-
-    """The central object of our NLP processing engine. It maintains a history
-    of statements and an object tree according to the input it receives."""
-
-    def __init__(self):
-        self.history = [Object("root")]
-        self.statements = []
-
-    def addStatement(self, statement):
-        self.statements.append(statement)
-        self.history.append(statement.Apply())
