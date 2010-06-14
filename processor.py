@@ -15,7 +15,8 @@ class Processor(object):
 
     prompt = "> "
 
-    keywords = ["is", "to", "\'", "set", "of", "what"]
+    keywords = ["is", "to", "\'", "set", "of", "what", "change", "from",
+        "dump"]
 
     def __init__(self):
         self.actions = {}
@@ -32,7 +33,8 @@ class Processor(object):
             ("what", UNDEFINED, "of", OBJECT) : self.QueryProperty,
             ("what", OBJECT, "of", OBJECT) : self.QueryProperty,
             ("change", OBJECT, "from", OBJECT, "to", OBJECT):
-                self.ReplaceParent
+                self.ReplaceParent,
+            ("dump", OBJECT): self.dumpObj
         }
 
         self.history = []
@@ -125,6 +127,15 @@ class Processor(object):
 
     def ReplaceParent(self, raw, words):
         obj = self.objects[words[1]]
+        orig = self.objects[words[3]]
+        new = self.objects[words[5]]
+        obj.replaceAncestor(orig, new)
+        self.history.append(raw)
+        return "okay."
+
+    def dumpObj(self, raw, words):
+        obj = self.objects[words[1]]
+        return obj.dump()
 
 if __name__ == '__main__':
     Processor().printloop()
