@@ -79,6 +79,16 @@ class CompoundAction(Action):
         for action in self.actions:
             action.perform(agent, patient)
 
+class Swap(Action):
+
+    """Swap agent and patient in child action"""
+
+    def __init__(self, action):
+        self.child = action
+
+    def perform(self, agent, patient):
+        self.child.perform(patient, agent)
+
 class Object(object):
 
     """An object is a reference to something in a space. Objects are also
