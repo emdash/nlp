@@ -221,7 +221,7 @@ class Object(object):
     def __eq__(self, other):
         # we compare based name, attribute. this should allow aliases with
         # identical names to appear to be the same object
-        return (self.name == other.name) and (self.attributes ==
+        return (self.name == other.name) and (self.attributes is 
             other.attributes)
 
     def __str__(self):
